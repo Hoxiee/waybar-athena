@@ -116,7 +116,9 @@ integration with Claude's OAuth usage endpoint; its response format may change.
   files are owner-only. Credentials are read locally and never cached or printed.
 - `Retry-After` is respected on HTTP 429, including manual refreshes.
 
-<img src="docs/screenshots/claude-usage.png" alt="Claude usage tooltip showing an exhausted session window and the weekly quota" width="347" />
+| After reset · expanded view | Session limit reached |
+| --- | --- |
+| <img src="docs/screenshots/claude-usage-reset.png" alt="Expanded Claude module and usage tooltip after the session reset: 0% session usage and 14% weekly usage" width="468" /> | <img src="docs/screenshots/claude-usage.png" alt="Claude usage tooltip showing an exhausted session window and the weekly quota" width="347" /> |
 
 The script uses only the Python standard library. Run it directly to inspect
 its newline-delimited Waybar JSON output, or use `--help`, `--toggle`,
