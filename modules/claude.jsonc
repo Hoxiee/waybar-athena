@@ -8,7 +8,10 @@
   // joins the face once it passes 50%; click for both windows side by side.
   // The meter turns amber past 75% or when the last hour's burn rate would
   // run the session out before it resets, red past 90%; an exhausted window
-  // turns the whole pill into an error chip with the time it comes back.
+  // becomes an error chip and auto-pauses until its last known reset.
+  // Right-click can check during an auto pause. Middle-click toggles a full
+  // manual pause: no requests, even after reset, until resumed. Both pause
+  // faces keep Claude's icon and the known reset time.
   "custom/claude": {
     "exec": "~/.config/waybar/scripts/claude-usage.py",
     "return-type": "json",
@@ -17,6 +20,6 @@
     "tooltip": true,
     "on-click": "~/.config/waybar/scripts/claude-usage.py --toggle",
     "on-click-right": "~/.config/waybar/scripts/claude-usage.py --refresh",
-    "on-click-middle": "~/.config/waybar/scripts/claude-usage.py --open"
+    "on-click-middle": "~/.config/waybar/scripts/claude-usage.py --pause"
   }
 }

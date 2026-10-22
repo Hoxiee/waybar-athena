@@ -101,12 +101,19 @@ integration with Claude's OAuth usage endpoint; its response format may change.
   it passes 50%. Click toggles the full view (both windows).
 - Amber past 75% or when the last hour's burn rate would exhaust the session
   before the reset; red past 90%; an exhausted window becomes an error chip
-  with the time it comes back.
+  with the time it comes back. Automatic polling pauses until the reset from
+  the last response, then fetches again. If both windows are exhausted, it
+  waits for the later reset; without a known reset it keeps polling.
 - Tooltip: both windows with an elapsed-time marker on the bar, the projected
   limit time, the weekly breakdown (Claude Code / Chats / …), extra usage.
 - Notifications at 80% and 95% of each window, once per window, and when the
   session limit lifts.
-- Right-click forces a fetch; middle-click opens claude.ai/settings/usage.
+- Right-click forces a fetch, including during an automatic pause; middle-click
+  toggles a manual pause. A manual pause disables all requests, even after the
+  reset; an in-flight request may finish. Its outlined pill keeps the Claude
+  icon, `Paused`, and the known reset time. The tooltip distinguishes reset
+  time from resuming polling and retains the last fetched values. Both pauses
+  survive Waybar restarts for the current runtime session.
 - It never refreshes the OAuth token — refresh tokens rotate, and spending one
   would log the running Claude Code out. On expiry the pill dims until Claude
   Code renews it.
@@ -122,8 +129,8 @@ integration with Claude's OAuth usage endpoint; its response format may change.
 
 The script uses only the Python standard library. Run it directly to inspect
 its newline-delimited Waybar JSON output, or use `--help`, `--toggle`,
-`--refresh`, and `--open`. Controls address the most recently started monitor
-for the current user/session.
+`--refresh`, `--pause`, and `--open` (opens claude.ai/settings/usage). Controls
+address the most recently started monitor for the current user/session.
 
 ## Wallpaper colours
 

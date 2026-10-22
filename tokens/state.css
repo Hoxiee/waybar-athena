@@ -129,6 +129,22 @@
   color: @on_error_container;
 }
 
+/* A manual pause is a quiet outlined pill; Claude keeps its tertiary icon.
+ * The time on its face is the cached reset, not an automatic resume. */
+#custom-claude.paused {
+  background-color: @surface_container;
+  box-shadow: inset 0 0 0 1px alpha(@tertiary, 0.22);
+  color: @on_surface_variant;
+}
+
+#custom-claude.paused:hover {
+  background-color: mix(@surface_container, @tertiary, 0.08);
+}
+
+#custom-claude.paused:active {
+  background-color: mix(@surface_container, @tertiary, 0.12);
+}
+
 #custom-claude.stale,
 #custom-claude.auth,
 #custom-claude.error {

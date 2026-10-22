@@ -7,7 +7,8 @@ prints a JSON line per render. Two clocks:
     reset countdown moves without touching the network;
   - every FETCH seconds it asks api.anthropic.com/api/oauth/usage — the endpoint
     behind Claude Code's own /usage — with the OAuth token Claude Code keeps in
-    ~/.claude/.credentials.json.
+    ~/.claude/.credentials.json. Exhausted limits suspend automatic requests
+    until their last known reset; a manual pause suspends all requests.
 
 It never refreshes that token. Refresh tokens rotate: spending one here would
 leave the running Claude Code holding a dead one and log it out. When the access
@@ -23,6 +24,7 @@ workaround the hand-written modules do not have.
 Control (wired in modules/claude.jsonc):
   claude-usage.py --toggle    compact <-> full view   (SIGUSR1 to the daemon)
   claude-usage.py --refresh   fetch now               (SIGUSR2 to the daemon)
+  claude-usage.py --pause     pause/resume polling    (SIGRTMIN to the daemon)
 """
 
 import argparse
@@ -164,7 +166,7 @@ class Window:
         self.length = length
         if self.resets and self.resets <= now:
             # The window rolled over since the last fetch; the API would say 0.
-            self.util, self.resets = 0.0, None
+            self.util, self.resets, self.locked = 0.0, None, None
         self.left = (self.resets - now) if self.resets else None
         self.elapsed = (1 - self.left / length) if self.left is not None else 0.0
         self.elapsed = max(0.0, min(1.0, self.elapsed))
@@ -172,6 +174,23 @@ class Window:
     @property
     def limited(self):
         return self.util >= 100 or bool(self.locked)
+
+
+def limit_reset(data, now):
+    """Resume when every exhausted subscription window has reset.
+
+    Without a deadline for any blocking window, keep polling rather than
+    guessing when that limit will lift. The cache also restores an auto pause
+    after a restart, without persisting a second pause flag.
+    """
+    if not data:
+        return None
+    windows = [Window(data.get(key), length, now)
+               for key, length in (("five_hour", SESSION), ("seven_day", WEEK))]
+    blocking = [win for win in windows if win.limited]
+    if blocking and all(win.resets for win in blocking):
+        return max(win.resets for win in blocking)
+    return None
 
 
 def burn_rate(samples, util, now, win):
@@ -288,22 +307,42 @@ def check_thresholds(state, name, win, now):
 def render(data, status, fetched, state, creds, now):
     pal = palette()
     full = state.get("mode") == "full"
+    paused = state.get("paused", False)
+    auto_until = limit_reset(data, now)
+    snapshot = paused or bool(auto_until)
+    icon = ICON.format("asterisk")
+    if paused:
+        icon = f"<span foreground='{pal['tertiary']}'>{icon}</span>"
+    controls = dim("Click  view  ·  Right-click  " + ("disabled" if paused else "refresh")
+                   + "  ·  Middle  " + ("resume" if paused else "pause"), "55%")
+    gap = "<span size='7pt'> </span>"
+    lines = [f"<span size='12.5pt' weight='bold'>{html.escape(plan_name(creds))}</span>"
+             f"   {dim('subscription usage')}", gap]
 
     if data is None:
+        if paused:
+            lines += [f"{ICON.format('pause')}  <b>Manual pause</b>",
+                      "No new usage requests. Resume with middle-click.",
+                      dim("Reset time is unknown — no usage fetched yet."), gap, controls]
+            return {"text": f"{icon}  Paused",
+                    "tooltip": "\n".join(lines),
+                    "class": "paused", "alt": "paused"}
         text = {"auth": "sign in", "offline": "offline", "ratelimit": "…"}.get(status, "—")
         tip = {
             "auth": "No valid Claude Code login.\nRun <b>claude</b> once; the pill recovers by itself.",
             "offline": "api.anthropic.com is unreachable.",
             "ratelimit": "Rate-limited by the usage endpoint; retrying later.",
         }.get(status, "Usage endpoint returned an error.")
-        return {"text": f"{ICON.format('asterisk')}  {text}", "tooltip": tip,
+        return {"text": f"{ICON.format('asterisk')}  {text}", "tooltip": tip + "\n" + controls,
                 "class": status if status in ("auth", "error") else "stale",
                 "alt": status}
 
-    s = Window(data.get("five_hour"), SESSION, now)
-    w = Window(data.get("seven_day"), WEEK, now)
+    # Pauses retain the last API values, while reset countdowns use wall time.
+    window_now = fetched if snapshot else now
+    s = Window(data.get("five_hour"), SESSION, window_now)
+    w = Window(data.get("seven_day"), WEEK, window_now)
 
-    rate = burn_rate(state.get("samples", []), s.util, now, s)
+    rate = 0.0 if snapshot else burn_rate(state.get("samples", []), s.util, now, s)
     hit_at = now + (100 - s.util) / rate if rate > 0 and s.util < 100 else None
     runs_out = bool(hit_at and s.resets and hit_at < s.resets)
 
@@ -322,17 +361,25 @@ def render(data, status, fetched, state, creds, now):
               "critical": pal["error"], "limited": pal["on_error_container"]}[cls]
 
     age = now - fetched
-    if status == "auth" or (age > STALE and status != "ok"):
+    if paused:
+        cls_out = "paused"
+        accent = pal["tertiary"]
+    elif status == "auth" or (age > STALE and status != "ok"):
         cls_out = "auth" if status == "auth" else "stale"
         accent = pal["outline"]
     else:
         cls_out = cls
 
     # ── bar face
-    icon = ICON.format("asterisk")
-    if cls == "limited":
-        blocking = s if s.limited else w
-        back = clock(blocking.resets, now) if blocking.resets else "—"
+    blocking = [win for win in (s, w) if win.limited]
+    known_reset = (max((win.resets for win in blocking if win.resets), default=None)
+                   if blocking else s.resets or w.resets)
+    if paused:
+        text = f"{icon}  Paused"
+        if known_reset:
+            text += f"  {dim('·')}  {clock(known_reset, now)}"
+    elif cls == "limited":
+        back = clock(known_reset, now) if known_reset else "—"
         text = f"{icon}  Limit  {dim('·')}  {back}"
     else:
         sess = f"{s.util:.0f}%  {meter(s.util, BAR_CELLS, accent)}"
@@ -352,21 +399,42 @@ def render(data, status, fetched, state, creds, now):
 
     # ── tooltip
     marker_c = pal["on_surface"]
-    gap = "<span size='7pt'> </span>"
-    lines = [f"<span size='12.5pt' weight='bold'>{html.escape(plan_name(creds))}</span>"
-             f"   {dim('subscription usage')}", gap]
+    if paused:
+        lines += [f"{ICON.format('pause')}  <b>Manual pause</b>",
+                  "No new usage requests. Resume with middle-click."]
+        if known_reset:
+            future = known_reset > now
+            label = "Known reset at" if future else "Reset was scheduled for"
+            countdown = f"  ·  in {duration(known_reset - now)}" if future else ""
+            lines.append(f"{label} <b>{clock(known_reset, now)}</b>{dim(countdown)}")
+        else:
+            lines.append(dim("No reset time in the last response."))
+        lines += [dim("Polling stays paused after the reset."), gap]
+    elif auto_until:
+        lines += [f"{ICON.format('hourglass_empty')}  <b>Auto pause · limit reached</b>",
+                  f"Resumes at <b>{clock(auto_until, now)}</b>"
+                  f"  {dim('·  in ' + duration(auto_until - now))}",
+                  dim("Automatic requests wait for the reset. Right-click to check now."), gap]
+    if snapshot:
+        lines += [dim("Values below are from the last fetch."), gap]
 
     def section(title, sub, win, extra):
         out = [f"<b>{title}</b>  {dim(sub)}",
                f"<span size='15pt' weight='bold'>{win.util:.0f}%</span> {dim('used')}",
                meter(win.util, TIP_CELLS, accent,
-                     marker=min(TIP_CELLS - 1, int(win.elapsed * TIP_CELLS)) if win.resets else None,
+                     marker=min(TIP_CELLS - 1, int(win.elapsed * TIP_CELLS)) if win.resets and not snapshot else None,
                      marker_colour=marker_c)]
-        if win.resets:
+        if snapshot and win.resets:
+            future = win.resets > now
+            label = "Resets" if future else "Reset was scheduled for"
+            countdown = f"  ·  in {duration(win.resets - now)}" if future else ""
+            out.append(dim(f"{label} {clock(win.resets, now)}{countdown}"))
+        elif win.resets:
             out.append(dim(f"Resets {clock(win.resets, now)}  ·  in {duration(win.left)}"
                            f"  ·  {win.elapsed * 100:.0f}% of window elapsed"))
         else:
-            out.append(dim("No active window — starts with the next message"))
+            out.append(dim("No active window in cached snapshot" if snapshot else
+                           "No active window — starts with the next message"))
         out += extra
         return out
 
@@ -392,7 +460,7 @@ def render(data, status, fetched, state, creds, now):
 
     for key, title in (("seven_day_opus", "Opus · weekly"), ("seven_day_sonnet", "Sonnet · weekly")):
         if data.get(key):
-            win = Window(data[key], WEEK, now)
+            win = Window(data[key], WEEK, window_now)
             lines += [gap, f"<b>{title}</b>  {win.util:.0f}%  {meter(win.util, 12, accent)}"]
 
     ex = data.get("extra_usage") or {}
@@ -409,7 +477,7 @@ def render(data, status, fetched, state, creds, now):
     note = {"auth": "  ·  login expired, run claude", "ratelimit": "  ·  rate-limited",
             "offline": "  ·  offline", "error": "  ·  fetch failed"}.get(status, "")
     lines.append(dim(f"Updated {when}{note}", "55%"))
-    lines.append(dim("Click  view  ·  Right-click  refresh  ·  Middle  usage page", "55%"))
+    lines.append(controls)
 
     return {"text": text, "tooltip": "\n".join(lines), "class": cls_out,
             "alt": cls_out, "percentage": int(round(s.util))}
@@ -440,6 +508,7 @@ def main():
     controls = parser.add_mutually_exclusive_group()
     controls.add_argument("--toggle", action="store_true", help="toggle compact/full view")
     controls.add_argument("--refresh", action="store_true", help="request a fetch from the running monitor")
+    controls.add_argument("--pause", action="store_true", help="toggle polling pause in the running monitor")
     controls.add_argument("--open", action="store_true", help="open the Claude usage page")
     args = parser.parse_args()
     if args.toggle:
@@ -447,6 +516,9 @@ def main():
         return
     if args.refresh:
         signal_daemon(signal.SIGUSR2)
+        return
+    if args.pause:
+        signal_daemon(signal.SIGRTMIN)
         return
     if args.open:
         subprocess.Popen(["xdg-open", USAGE_PAGE], stdout=subprocess.DEVNULL,
@@ -464,28 +536,43 @@ def main():
     flags = set()
     signal.signal(signal.SIGUSR1, lambda *_: flags.add("toggle"))
     signal.signal(signal.SIGUSR2, lambda *_: flags.add("refresh"))
+    signal.signal(signal.SIGRTMIN, lambda *_: flags.add("pause"))
 
     state = load(STATE, {})
     cache = load(CACHE, {})
     data, fetched = cache.get("data"), cache.get("fetched", 0)
     status = "ok" if data else "error"
-    next_fetch = fetched + FETCH
+    next_fetch = limit_reset(data, fetched) or fetched + FETCH
     last_manual = 0.0
 
     while True:
         now = time.time()
 
-        manual = ("refresh" in flags and now - last_manual >= MIN_MANUAL
+        # Handle controls before the fetch deadline, so a pause wins over a
+        # scheduled or manual request. Keep signals arriving during fetch()
+        # for the next iteration rather than clearing them after the request.
+        if "pause" in flags:
+            flags.discard("pause")
+            state["paused"] = not state.get("paused", False)
+            save(STATE, state)
+        if "toggle" in flags:
+            flags.discard("toggle")
+            state["mode"] = "compact" if state.get("mode") == "full" else "full"
+            save(STATE, state)
+        paused = state.get("paused", False)
+        auto_until = limit_reset(data, now)
+        manual = (not paused and "refresh" in flags and now - last_manual >= MIN_MANUAL
                   and (status != "ratelimit" or now >= next_fetch))
+        flags.discard("refresh")
         if manual:
             last_manual = now
-        if manual or now >= next_fetch:
+        if not paused and (manual or (not auto_until and now >= next_fetch)):
             status, fresh, retry = fetch()
             now = time.time()
             if fresh is not None:
                 data, fetched = fresh, now
                 save(CACHE, {"data": data, "fetched": fetched})
-                next_fetch = now + FETCH
+                next_fetch = limit_reset(fresh, now) or now + FETCH
             else:
                 next_fetch = now + (retry or FETCH)
 
@@ -507,11 +594,6 @@ def main():
                 check_thresholds(state, "weekly", Window(fresh.get("seven_day"), WEEK, now), now)
                 save(STATE, state)
 
-        if "toggle" in flags:
-            state["mode"] = "compact" if state.get("mode") == "full" else "full"
-            save(STATE, state)
-        flags.clear()
-
         try:
             out = render(data, status, fetched, state, read_creds(), now)
             sys.stdout.write(json.dumps(out, ensure_ascii=False) + "\n")
@@ -520,9 +602,13 @@ def main():
             return  # Waybar went away.
 
         # Wake at the next minute boundary (the countdown only shows minutes),
-        # or at the next fetch, whichever is first.
+        # or at the next fetch, whichever is first. Paused monitors only wake
+        # for local renders and controls, even if the fetch deadline has passed.
         now = time.time()
-        timeout = min(60 - now % 60 + 0.2, max(1.0, next_fetch - now))
+        timeout = 60 - now % 60 + 0.2
+        if not paused:
+            deadline = max(next_fetch, limit_reset(data, now) or 0)
+            timeout = min(timeout, max(0.1, deadline - now))
         try:
             ready, _, _ = select.select([rfd], [], [], timeout)
         except InterruptedError:
