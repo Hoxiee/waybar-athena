@@ -1,0 +1,58 @@
+{
+  // Flat groups only — no nesting. Waybar's own docs do not state that groups
+  // may contain groups, and it is not worth betting the bar on undocumented
+  // behaviour, so every drawer anchor is a real module.
+
+  // ── left ────────────────────────────────────────────────────────────────
+  "group/compute": {
+    "orientation": "horizontal",
+    "modules": ["cpu", "temperature"]
+  },
+
+  "group/storage": {
+    "orientation": "horizontal",
+    "modules": ["memory", "disk"]
+  },
+
+  // ── right ───────────────────────────────────────────────────────────────
+  // Drawers all open leftward on the same 300 ms the CSS shape changes use.
+
+  // Anchor shows "{icon} {volume}%"; the drawer adds the slider and the mic.
+  "group/audio": {
+    "orientation": "horizontal",
+    "drawer": {
+      "transition-duration": 300,
+      "transition-left-to-right": false
+    },
+    "modules": ["pulseaudio", "pulseaudio/slider", "pulseaudio#microphone"]
+  },
+
+  // Status icons share one island, Android-status-bar style, instead of four
+  // separate circles. Each icon still has its own state layer.
+  "group/status": {
+    "orientation": "horizontal",
+    "modules": ["custom/ptt", "idle_inhibitor", "network", "bluetooth"]
+  },
+
+  // Notification bell; hovering reveals the tray (nm-applet and friends).
+  "group/tray-group": {
+    "orientation": "horizontal",
+    "drawer": {
+      "transition-duration": 300,
+      "transition-left-to-right": false
+    },
+    "modules": ["custom/notifications", "tray"]
+  },
+
+  "group/power": {
+    "orientation": "horizontal",
+    "drawer": {
+      "transition-duration": 300,
+      "transition-left-to-right": false
+    },
+    // The drawer opens leftward, and children keep this order left-to-right
+    // with the anchor last. Reversed so poweroff lands *furthest* from the
+    // anchor: a slip off the anchor hits lock, not shutdown.
+    "modules": ["custom/power", "custom/shutdown", "custom/reboot", "custom/logout", "custom/lock"]
+  }
+}

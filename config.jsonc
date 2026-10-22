@@ -1,0 +1,77 @@
+{
+  "layer": "top",
+  "position": "top",
+  // 47 = a 39px island (tokens/capsule.css) + 4px margin above and below.
+  // Declaring less makes GTK log "Requested height ... is less than the
+  // minimum height" and use 47 anyway.
+  "height": 47,
+  "margin-top": 4,
+  "margin-left": 8,
+  "margin-right": 8,
+  "name": "waybar",
+
+  // 0: gaps live in tokens/capsule.css as a single margin rule (3px per side,
+  // 6px between islands). Setting both makes them compound.
+  "spacing": 0,
+
+  // Picks up edits to style.css and everything it @imports without a restart.
+  "reload_style_on_change": true,
+
+  // Every module file must be listed here; a module whose file is missing is
+  // silently hidden.
+  "include": [
+    "./modules/groups.jsonc",
+    "./modules/launcher.jsonc",
+    "./modules/language.jsonc",
+    "./modules/compute.jsonc",
+    "./modules/gpu.jsonc",
+    "./modules/newapi.jsonc",
+    "./modules/storage.jsonc",
+    "./modules/health.jsonc",
+    "./modules/workspace.jsonc",
+    "./modules/media.jsonc",
+    "./modules/ptt.jsonc",
+    "./modules/claude.jsonc",
+    "./modules/audio.jsonc",
+    "./modules/status.jsonc",
+    "./modules/notifications.jsonc",
+    "./modules/clock.jsonc",
+    "./modules/power.jsonc"
+  ],
+
+  // Left: identity, then always-on telemetry — CPU, GPU, RAM, disk.
+  // systemd-failed-units sets hide-on-ok, so it is absent unless something broke.
+  // custom/newapi-1..6 are six fixed slots for New API account spend. Slots with
+  // no account behind them print nothing and Waybar hides them, so the visible
+  // count follows `newapi list` without an edit here.
+  "modules-left": [
+    "custom/distro",
+    "niri/language",
+    "group/compute",
+    "custom/gpu",
+    "group/storage",
+    "custom/newapi-1",
+    "custom/newapi-2",
+    "custom/newapi-3",
+    "custom/newapi-4",
+    "custom/newapi-5",
+    "custom/newapi-6",
+    "systemd-failed-units"
+  ],
+
+  "modules-center": [
+    "niri/workspaces"
+  ],
+
+  // Right: transient state (media) → Claude quota → controls (audio) →
+  // status icons → notifications and tray → time → session.
+  "modules-right": [
+    "mpris",
+    "custom/claude",
+    "group/audio",
+    "group/status",
+    "group/tray-group",
+    "clock",
+    "group/power"
+  ]
+}

@@ -1,0 +1,25 @@
+name: Check configuration
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate config and scripts
+        run: python scripts/check-config.py
+      - name: Test Claude monitor offline
+        run: python -m unittest discover -s tests -v
+      - name: Install GTK3 CSS checker
+        run: sudo apt-get update && sudo apt-get install -y python3-gi gir1.2-gtk-3.0 xvfb xauth
+      - name: Parse stylesheet with GTK3
+        run: xvfb-run -a /usr/bin/python3 scripts/check-config.py --gtk

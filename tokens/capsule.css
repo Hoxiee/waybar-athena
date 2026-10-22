@@ -1,0 +1,240 @@
+/*======= MODULE CAPSULE =======*/
+/* One shape for every island on the bar, workspaces included: 39px tall, full
+ * pill corners, a flat surface_container tone. Elevation in M3 is a tone, not a
+ * drop shadow; the only line is a 7% on_surface hairline, which disappears on
+ * a filled chip and keeps a dark island from melting into a dark wallpaper.
+ *
+ * Group ids are the name after "group/", so #compute #storage #audio #status
+ * #tray-group #power are the group boxes. A group is a container, not a button:
+ * the island stays still and each child gets a state layer of its own (INNER
+ * ITEMS below). Single-label pills are the button, so the island itself reacts.
+ */
+#custom-distro,
+#language,
+#compute,
+#custom-gpu,
+#storage,
+#custom-newapi-1,
+#custom-newapi-2,
+#custom-newapi-3,
+#custom-newapi-4,
+#custom-newapi-5,
+#custom-newapi-6,
+#systemd-failed-units,
+#workspaces,
+#mpris,
+#custom-claude,
+#audio,
+#status,
+#tray-group,
+#clock,
+#power {
+  min-height: 39px;
+  margin: 4px 3px;
+  background-color: @surface_container;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 1px alpha(@on_surface, 0.07);
+  color: @on_surface_variant;
+  transition: background-color 200ms cubic-bezier(0.2, 0, 0, 1),
+              color 200ms cubic-bezier(0.2, 0, 0, 1),
+              border-radius 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Text pills: 15px to the first glyph on both sides. */
+#custom-gpu,
+#custom-newapi-1,
+#custom-newapi-2,
+#custom-newapi-3,
+#custom-newapi-4,
+#custom-newapi-5,
+#custom-newapi-6,
+#systemd-failed-units,
+#mpris,
+#custom-claude,
+#clock {
+  padding: 0 15px;
+}
+
+/* Icon pills: exact circles. GTK3 min-width is the content box, so with no
+ * padding the pill is 39 × 39. */
+#custom-distro,
+#language {
+  min-width: 39px;
+  padding: 0;
+}
+
+/* Groups: 4px, plus the 2px margin and 9px padding of each child, lands text
+ * at the same 15px inset as a single pill. */
+#compute,
+#storage,
+#audio,
+#status,
+#tray-group,
+#power {
+  padding: 0 4px;
+}
+
+/*======= STATE LAYERS =======*/
+/* Hover blends 8% of the content colour into the surface and eases the corners
+ * from a full pill to 14px; press goes to 12% and 10px. The shape change is
+ * what makes the bar feel alive rather than painted, so it is the same curve
+ * everywhere. Groups and #workspaces are absent: their children react. */
+#custom-distro:hover,
+#language:hover,
+#custom-gpu:hover,
+#custom-newapi-1:hover,
+#custom-newapi-2:hover,
+#custom-newapi-3:hover,
+#custom-newapi-4:hover,
+#custom-newapi-5:hover,
+#custom-newapi-6:hover,
+#systemd-failed-units:hover,
+#mpris:hover,
+#custom-claude:hover,
+#clock:hover {
+  background-color: mix(@surface_container, @on_surface, 0.08);
+  border-radius: 14px;
+}
+
+#custom-distro:active,
+#language:active,
+#custom-gpu:active,
+#custom-newapi-1:active,
+#custom-newapi-2:active,
+#custom-newapi-3:active,
+#custom-newapi-4:active,
+#custom-newapi-5:active,
+#custom-newapi-6:active,
+#systemd-failed-units:active,
+#mpris:active,
+#custom-claude:active,
+#clock:active {
+  background-color: mix(@surface_container, @on_surface, 0.12);
+  border-radius: 10px;
+}
+
+/*======= INNER ITEMS =======*/
+/* Children of a group are 31px pills centred in the 39px island (4px above
+ * and below), with a state layer of their own. Icon-only children are 31px
+ * circles. */
+#compute #cpu,
+#compute #temperature,
+#storage #memory,
+#storage #disk,
+#audio #pulseaudio,
+#status #custom-ptt,
+#status #idle_inhibitor,
+#status #network,
+#status #bluetooth,
+#tray-group #custom-notifications,
+#power label {
+  margin: 4px 2px;
+  padding: 0 9px;
+  background-color: transparent;
+  border-radius: 16px;
+  transition: background-color 200ms cubic-bezier(0.2, 0, 0, 1),
+              color 200ms cubic-bezier(0.2, 0, 0, 1),
+              border-radius 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+#status #custom-ptt,
+#status #idle_inhibitor,
+#status #network,
+#status #bluetooth,
+#power label {
+  min-width: 31px;
+  padding: 0;
+}
+
+#compute #cpu:hover,
+#compute #temperature:hover,
+#storage #memory:hover,
+#storage #disk:hover,
+#audio #pulseaudio:hover,
+#status #custom-ptt:hover,
+#status #idle_inhibitor:hover,
+#status #network:hover,
+#status #bluetooth:hover,
+#tray-group #custom-notifications:hover,
+#power label:hover {
+  background-color: alpha(@on_surface, 0.08);
+  border-radius: 11px;
+}
+
+#compute #cpu:active,
+#compute #temperature:active,
+#storage #memory:active,
+#storage #disk:active,
+#audio #pulseaudio:active,
+#status #custom-ptt:active,
+#status #idle_inhibitor:active,
+#status #network:active,
+#status #bluetooth:active,
+#tray-group #custom-notifications:active,
+#power label:active {
+  background-color: alpha(@on_surface, 0.12);
+  border-radius: 8px;
+}
+
+/*======= ANTI-JITTER =======*/
+/* modules-left is left-aligned, so anything that widens shoves every pill to
+ * its right — and "4%" → "100%" happens every 5 s. Tabular figures make every
+ * digit the same advance, so a min-width sized for the widest form ("100%",
+ * "100°C", "100% · 100°C") is enough. Widths are content boxes. */
+#cpu          { min-width: 62px;  }
+#temperature  { min-width: 72px;  }
+#custom-gpu   { min-width: 126px; }
+#memory       { min-width: 58px;  }
+#disk         { min-width: 68px;  }
+#pulseaudio   { min-width: 62px;  }
+
+/* The newapi slots are deliberately absent from this list. Their width is set
+ * by the account label, which the user chooses and which never changes at
+ * runtime, so there is nothing to stabilise; a shared min-width would only pad
+ * short labels. */
+
+/*======= IDENTITY =======*/
+/* Keyboard layout: two capitals, tracked out, so it reads as a tag. */
+#language {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+/*======= TRAY =======*/
+#tray {
+  margin: 0 4px 0 2px;
+  padding: 0 6px;
+}
+
+#tray > .passive,
+#tray > .active,
+#tray > .needs-attention {
+  -gtk-icon-effect: none;
+}
+
+#tray menu {
+  background-color: @surface_container_high;
+  border: 1px solid alpha(@outline_variant, 0.6);
+  border-radius: 12px;
+  padding: 6px 0;
+}
+
+#tray menu menuitem {
+  padding: 6px 14px;
+  color: @on_surface;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+#tray menu menuitem:hover {
+  background-color: alpha(@on_surface, 0.08);
+}
+
+/*======= SESSION =======*/
+/* Drawer children only look dangerous on hover, so the expanded row is not a
+ * wall of red. Each takes a state layer of its own colour. */
+#custom-lock:hover     { color: @primary;    background-color: alpha(@primary, 0.16); }
+#custom-logout:hover   { color: @tertiary;   background-color: alpha(@tertiary, 0.16); }
+#custom-reboot:hover   { color: @state_warn; background-color: alpha(@state_warn, 0.16); }
+#custom-shutdown:hover { color: @error;      background-color: alpha(@error, 0.16); }

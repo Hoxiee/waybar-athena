@@ -1,0 +1,41 @@
+{
+  // A drawer. Shutdown and reboot need a hover before they are clickable, so a
+  // stray click on the bar edge cannot power the machine off. The anchor itself
+  // is inert on left-click; right-click opens wlogout.
+  "custom/power": {
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>power_settings_new</span>",
+    "on-click-right": "wlogout",
+    "tooltip": true,
+    "tooltip-format": "Session  ·  hover to expand"
+  },
+
+  "custom/lock": {
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>lock</span>",
+    "on-click": "swaylock -f",
+    "tooltip": true,
+    "tooltip-format": "Lock"
+  },
+
+  "custom/logout": {
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>logout</span>",
+    "on-click": "niri msg action quit",
+    "tooltip": true,
+    "tooltip-format": "Log out  (niri asks to confirm)"
+  },
+
+  "custom/reboot": {
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>restart_alt</span>",
+    "on-click": "systemctl reboot",
+    "tooltip": true,
+    "tooltip-format": "Reboot"
+  },
+
+  // mode_off_on, not power_settings_new: the anchor already draws that glyph,
+  // and two identical icons side by side read as one printed twice.
+  "custom/shutdown": {
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>mode_off_on</span>",
+    "on-click": "systemctl poweroff",
+    "tooltip": true,
+    "tooltip-format": "Shut down"
+  }
+}

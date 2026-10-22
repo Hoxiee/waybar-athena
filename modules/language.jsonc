@@ -1,0 +1,12 @@
+{
+  // Designed for niri's "us,ru" layouts with grp:alt_shift_toggle.
+  // format-<lang> keys off {shortDescription} ("en"/"ru");
+  // the module also adds a CSS class named after {short} ("us"/"ru"),
+  // which tokens/state.css uses to accent RU.
+  "niri/language": {
+    "format": "{}",
+    "format-en": "EN",
+    "format-ru": "RU",
+    "tooltip": true
+  }
+}

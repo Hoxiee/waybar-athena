@@ -1,0 +1,50 @@
+/* Material You on GTK3 CSS.
+ *
+ * Everything on the bar is a role from the matugen palette (colors.css), so the
+ * whole bar re-themes with the wallpaper. M3 has no "warning" or "success"
+ * roles, so those two stay literal; "critical" is the palette's own @error.
+ *
+ * Type: Roboto Medium 16px with tabular figures, so "12%" and "100%" use the
+ * same digit advance. Icons are Material Symbols Rounded, set per module in the
+ * format strings (Pango markup), never here — the label font is for text only.
+ *
+ * Motion tokens (GTK3 has no custom properties, so these are repeated as
+ * literals): M3 emphasized easing cubic-bezier(0.2, 0, 0, 1); 200ms for colour
+ * (state layers), 300ms for shape and size.
+ */
+@define-color state_ok   #a6e3a1;
+@define-color state_warn #f9e2af;
+
+* {
+  margin: 0;
+  padding: 0;
+  min-height: 0px;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  font-family: "Roboto", "JetBrainsMono Nerd Font", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  font-feature-settings: "tnum";
+}
+
+window#waybar {
+  background: transparent;
+}
+
+/*======= TOOLTIP =======*/
+/* M3 rich tooltip: one step above the islands in tone, 12px corners. The
+ * hairline is there because a tooltip opens over arbitrary windows. */
+tooltip {
+  background: @surface_container_high;
+  border: 1px solid alpha(@outline_variant, 0.6);
+  border-radius: 12px;
+}
+
+tooltip label {
+  padding: 10px 14px;
+  color: @on_surface;
+  font-size: 13px;
+  font-weight: 400;
+}

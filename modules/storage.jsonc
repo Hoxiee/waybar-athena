@@ -1,0 +1,31 @@
+{
+  // Values are always visible. Previously both of these were icon-only with
+  // the number behind a format-alt click and "tooltip": false, so the bar
+  // showed nothing at all until you clicked each pill.
+  "memory": {
+    "on-click": "alacritty -e htop",
+    "interval": 10,
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>memory_alt</span> {used:0.0f}G",
+    "states": {
+      "warning": 75,
+      "critical": 90
+    },
+    "tooltip": true,
+    "tooltip-format": "RAM   {used:0.1f} / {total:0.0f} GiB  ({percentage}%)\nFree  {avail:0.1f} GiB\nSwap  {swapUsed:0.1f} / {swapTotal:0.0f} GiB"
+  },
+
+  // "unit": "GiB" makes {specific_used} a bare GiB number, so the pill reads
+  // "259G" instead of "257.3GiB".
+  "disk": {
+    "interval": 300,
+    "path": "/",
+    "unit": "GiB",
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>hard_drive_2</span> {specific_used:0.0f}G",
+    "states": {
+      "warning": 80,
+      "critical": 90
+    },
+    "tooltip": true,
+    "tooltip-format": "{path}   {specific_used:0.0f} / {specific_total:0.0f} GiB  ({percentage_used}%)\nFree  {specific_free:0.0f} GiB"
+  }
+}

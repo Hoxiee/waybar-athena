@@ -1,0 +1,65 @@
+/* The island itself (background, shape) comes from capsule.css; this file owns
+ * only what is inside it.
+ *
+ * Pac-Man as an M3 navigation indicator. Each workspace is the same 31 × 46px
+ * capsule slot with a state layer, like the children of a group. The focused
+ * one is Pac-Man on a filled primary capsule; every slot keeps its size and
+ * shape in all states, only colour changes.
+ *
+ * The ghosts keep their arcade identities, mapped onto palette roles so they
+ * still follow the wallpaper: Blinky @error, Pinky @tertiary, Inky @primary,
+ * Clyde @state_warn, repeating every four. A workspace with no windows is a
+ * faded ghost, so occupied ones stand out at a glance.
+ */
+#workspaces {
+  padding: 0 4px;
+}
+
+#workspaces button {
+  min-width: 46px;
+  margin: 4px 2px;
+  padding: 0;
+  background-color: transparent;
+  background-image: none;
+  border-radius: 16px;
+  transition: background-color 200ms cubic-bezier(0.2, 0, 0, 1),
+              color 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+#workspaces button:nth-child(4n+1) { color: @error; }
+#workspaces button:nth-child(4n+2) { color: @tertiary; }
+#workspaces button:nth-child(4n+3) { color: @primary; }
+#workspaces button:nth-child(4n+4) { color: @state_warn; }
+
+#workspaces button.empty {
+  color: alpha(@on_surface_variant, 0.38);
+}
+
+#workspaces button:hover {
+  background-color: alpha(@on_surface, 0.08);
+}
+
+#workspaces button:active {
+  background-color: alpha(@on_surface, 0.12);
+}
+
+#workspaces button.active {
+  background-color: @primary;
+  color: @on_primary;
+}
+
+#workspaces button.active:hover {
+  background-color: mix(@primary, @on_primary, 0.08);
+}
+
+/* Urgent: the ghost-off glyph on a pulsing error container. */
+#workspaces button.urgent {
+  background-color: @error_container;
+  color: @on_error_container;
+  animation: pulse-urgent 700ms cubic-bezier(0.2, 0, 0, 1) infinite alternate;
+}
+
+@keyframes pulse-urgent {
+  from { background-color: alpha(@error_container, 0.35); }
+  to   { background-color: @error_container; }
+}

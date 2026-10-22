@@ -1,0 +1,39 @@
+{
+  // The volume number is on the face of the pill; the drawer adds the slider
+  // and the mic.
+  "pulseaudio": {
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>{icon}</span> {volume}%",
+    "format-muted": "<span font='Material Symbols Rounded 21px' rise='-4pt'>volume_off</span> mute",
+    "format-bluetooth": "<span font='Material Symbols Rounded 21px' rise='-4pt'>headphones</span> {volume}%",
+    "format-bluetooth-muted": "<span font='Material Symbols Rounded 21px' rise='-4pt'>headset_off</span> mute",
+    "format-icons": {
+      "headphone": "headphones",
+      "headset": "headset_mic",
+      "hands-free": "headset_mic",
+      "default": ["volume_mute", "volume_down", "volume_up"]
+    },
+    "scroll-step": 5,
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "tooltip": true,
+    "tooltip-format": "{desc}\n\nOutput  {volume}%"
+  },
+
+  // Microphone controls, also useful alongside yaptt push-to-talk.
+  "pulseaudio#microphone": {
+    "format": "{format_source}",
+    "format-source": "<span font='Material Symbols Rounded 21px' rise='-4pt'>mic</span> {volume}%",
+    "format-source-muted": "<span font='Material Symbols Rounded 21px' rise='-4pt'>mic_off</span> mute",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-",
+    "tooltip": true,
+    "tooltip-format": "Input  {volume}%  ·  click to mute"
+  },
+
+  "pulseaudio/slider": {
+    "min": 0,
+    "max": 100,
+    "orientation": "horizontal"
+  }
+}

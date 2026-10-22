@@ -1,0 +1,10 @@
+{
+  // Arch glyph → vicinae. Start `vicinae server` with your compositor.
+  // The one Nerd Font icon left on the bar: Material Symbols has no distro marks.
+  "custom/distro": {
+    "format": "<span font='JetBrainsMono Nerd Font 21px'>󰣇</span>",
+    "on-click": "vicinae toggle",
+    "tooltip": true,
+    "tooltip-format": "Launcher  ·  vicinae"
+  }
+}

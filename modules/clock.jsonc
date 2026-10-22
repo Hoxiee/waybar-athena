@@ -1,0 +1,34 @@
+{
+  // The face is "Thu 22  16:54": the date at 70% alpha so the time leads.
+  // format-alt swaps in the long date; both stay on one line. The span opens
+  // outside the braces because a chrono spec has to start with '%', and the
+  // whole face is one spec because the clock passes a single argument.
+  "clock": {
+    "timezone": "Europe/Moscow",
+    "interval": 30,
+    "format": "<span fgalpha='70%'>{:%a %d</span>  %H:%M}",
+    "format-alt": "<span fgalpha='70%'>{:%A, %d %B</span>  %H:%M}",
+    // The calendar is column-aligned ASCII, so it needs a monospace face; the
+    // tooltip's own font is Roboto. Pango cannot read GTK colour tokens, so
+    // the roles are literal hex from tokens/colors.css: primary, secondary,
+    // outline, and on_primary on primary for today.
+    "tooltip-format": "<span font_family='JetBrains Mono' size='10pt'>{calendar}</span>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "weeks-pos": "left",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#88d1ec'><b>{}</b></span>",
+        "weeks": "<span color='#8a9296'>{}</span>",
+        "weekdays": "<span color='#b3cad4'><b>{}</b></span>",
+        "today": "<span color='#003544' bgcolor='#88d1ec'><b>{}</b></span>"
+      }
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  // Pin the physical link so a VPN's default route does not replace it.
+  // Change "interface" for your machine, or remove it for automatic selection.
+  "network": {
+    "interface": "wlp7s0",
+    "interval": 5,
+    "format-wifi": "<span font='Material Symbols Rounded 21px' rise='-4pt'>{icon}</span>",
+    "format-ethernet": "<span font='Material Symbols Rounded 21px' rise='-4pt'>lan</span>",
+    "format-linked": "<span font='Material Symbols Rounded 21px' rise='-4pt'>signal_wifi_statusbar_not_connected</span>",
+    "format-disconnected": "<span font='Material Symbols Rounded 21px' rise='-4pt'>signal_wifi_off</span>",
+    "format-disabled": "<span font='Material Symbols Rounded 21px' rise='-4pt'>wifi_off</span>",
+    // The arc-only wifi_* set, not signal_wifi_*: those are solid wedges and
+    // looked twice as heavy as the outlined icons next to them.
+    "format-icons": ["wifi_1_bar", "wifi_1_bar", "wifi_2_bar", "wifi", "wifi"],
+    "tooltip-format-disconnected": "No connection",
+    "tooltip-format-disabled": "Wi-Fi is off",
+    "tooltip-format-wifi": "{essid}  ·  {signalStrength}%\n{ipaddr}  ·  {frequency} GHz\n↓ {bandwidthDownBytes}   ↑ {bandwidthUpBytes}",
+    "tooltip-format-ethernet": "{ifname}  ·  {ipaddr}\n↓ {bandwidthDownBytes}   ↑ {bandwidthUpBytes}",
+    "tooltip-format-linked": "{ifname}: no IP address",
+    // nm-applet is a tray client, so this relies on group/tray-group.
+    "on-click": "nm-applet --indicator",
+    "on-click-right": "pkill nm-applet",
+    "on-scroll-up": "nmcli radio wifi on",
+    "on-scroll-down": "nmcli radio wifi off"
+  },
+
+  "bluetooth": {
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>bluetooth</span>",
+    "format-connected": "<span font='Material Symbols Rounded 21px' rise='-4pt'>bluetooth_connected</span>",
+    "format-disabled": "<span font='Material Symbols Rounded 21px' rise='-4pt'>bluetooth_disabled</span>",
+    "format-off": "<span font='Material Symbols Rounded 21px' rise='-4pt'>bluetooth_disabled</span>",
+    "tooltip-format": "{controller_alias}  ·  {status}",
+    "tooltip-format-connected": "{num_connections} connected\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias}  ·  {device_battery_percentage}%",
+    "on-click": "blueman-manager",
+    "on-click-right": "rfkill toggle bluetooth"
+  }
+}

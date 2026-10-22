@@ -1,0 +1,20 @@
+{
+  // yaptt-indicator prints {"class","text","tooltip"} per invocation, with a
+  // Nerd Font mic in "text". scripts/ptt.sh passes the class on as "alt" so the
+  // icon comes from Material Symbols like the rest of the bar.
+  // Kept at a 1 s poll: push-to-talk state has to track the key, and the
+  // binary is trivial. Classes are styled in tokens/state.css.
+  "custom/ptt": {
+    "exec": "~/.config/waybar/scripts/ptt.sh",
+    "return-type": "json",
+    "format": "{icon}",
+    "format-icons": {
+      "ptt-off": "<span font='Material Symbols Rounded 21px' rise='-4pt'>mic_off</span>",
+      "ptt-on": "<span font='Material Symbols Rounded 21px' rise='-4pt'>mic</span>",
+      "ptt-talking": "<span font='Material Symbols Rounded 21px @FILL=1' rise='-4pt'>mic</span>"
+    },
+    "on-click": "yaptt-toggle",
+    "interval": 1,
+    "tooltip": true
+  }
+}

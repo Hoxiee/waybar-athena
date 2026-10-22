@@ -1,0 +1,22 @@
+# Python and development artifacts
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.DS_Store
+
+# Machine-specific configuration and external integrations
+config.local.jsonc
+scripts/*.local.sh
+
+# Credentials and runtime data are never part of the theme
+.env
+.env.*
+.credentials.json
+credentials.json
+accounts.json
+usage.json
+state.json
+*.log
+*.bak
+*.tmp

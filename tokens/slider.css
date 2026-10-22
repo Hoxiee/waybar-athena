@@ -1,0 +1,41 @@
+/* Volume slider inside the audio drawer — M3 (2024) slider: a thick rounded
+ * track, the active part in primary, the rest in secondary_container, and a
+ * narrow vertical handle instead of a knob. The handle thins out while held. */
+#pulseaudio-slider {
+  margin: 0 6px;
+  padding: 0 2px;
+  background-color: transparent;
+}
+
+#pulseaudio-slider trough {
+  min-height: 8px;
+  min-width: 96px;
+  border-radius: 4px;
+  background-color: @secondary_container;
+}
+
+#pulseaudio-slider highlight {
+  min-height: 8px;
+  border-radius: 4px;
+  background-color: @primary;
+}
+
+#pulseaudio-slider slider {
+  min-height: 22px;
+  min-width: 4px;
+  margin: -7px 0;
+  border-radius: 2px;
+  background-color: @primary;
+  transition: min-width 200ms cubic-bezier(0.2, 0, 0, 1),
+              min-height 200ms cubic-bezier(0.2, 0, 0, 1),
+              margin 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+#pulseaudio-slider slider:hover {
+  min-height: 26px;
+  margin: -9px 0;
+}
+
+#pulseaudio-slider slider:active {
+  min-width: 2px;
+}

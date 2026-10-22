@@ -1,0 +1,91 @@
+/* Identity: which island is which, using only palette roles.
+ *
+ * Two kinds of island, as in M3:
+ *   - tonal text on a surface — the everyday readouts. Hue says what it is:
+ *     primary = compute and audio, tertiary = memory and Claude, secondary =
+ *     money. Status icons stay neutral and only take a colour when they are
+ *     "on" (state.css).
+ *   - filled chips — the few things that should catch the eye (clock, media).
+ *     A container colour with its matching on-colour.
+ * state.css loads after this file and repaints a module when a threshold is
+ * crossed, so every rule here is the resting state.
+ */
+
+/*======= TONAL TEXT =======*/
+#cpu,
+#temperature,
+#custom-gpu,
+#pulseaudio {
+  color: @primary;
+}
+
+#memory,
+#disk,
+#custom-claude {
+  color: @tertiary;
+}
+
+#custom-newapi-1,
+#custom-newapi-2,
+#custom-newapi-3,
+#custom-newapi-4,
+#custom-newapi-5,
+#custom-newapi-6,
+#pulseaudio.microphone {
+  color: @secondary;
+}
+
+#custom-ptt,
+#idle_inhibitor,
+#network,
+#bluetooth,
+#custom-notifications,
+#custom-power,
+#custom-lock,
+#custom-logout,
+#custom-reboot,
+#custom-shutdown {
+  color: @on_surface_variant;
+}
+
+/*======= FILLED CHIPS =======*/
+/* No hairline: on a filled chip it reads as a dark rim. */
+#clock,
+#mpris {
+  box-shadow: none;
+}
+
+/* The launcher is a plain tonal circle like its neighbour: a filled chip at the
+ * far left edge shouted over everything else. The glyph is 4px wider on its
+ * right than it looks, so the box is 35px + 4px of right padding to centre it. */
+#custom-distro {
+  min-width: 35px;
+  padding: 0 4px 0 0;
+  color: @primary;
+}
+
+#clock {
+  background-color: @primary_container;
+  color: @on_primary_container;
+}
+
+#clock:hover {
+  background-color: mix(@primary_container, @on_primary_container, 0.08);
+}
+
+#clock:active {
+  background-color: mix(@primary_container, @on_primary_container, 0.12);
+}
+
+#mpris {
+  background-color: @secondary_container;
+  color: @on_secondary_container;
+}
+
+#mpris:hover {
+  background-color: mix(@secondary_container, @on_secondary_container, 0.08);
+}
+
+#mpris:active {
+  background-color: mix(@secondary_container, @on_secondary_container, 0.12);
+}

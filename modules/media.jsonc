@@ -1,0 +1,29 @@
+{
+  // Deliberately terse: status glyph + a clipped title, nothing else.
+  // The module hides itself when no player is present.
+  //
+  // TelegramDesktop also registers on MPRIS (for voice notes and inline video)
+  // and will steal the slot from a real music player. Add it to ignored-players
+  // if that becomes annoying:  "ignored-players": ["TelegramDesktop"]
+  "mpris": {
+    "format": "{status_icon} {dynamic}",
+    "dynamic-order": ["title"],
+    "dynamic-len": 26,
+    // Without title-len the title has no limit of its own, and {dynamic}
+    // drops whole tags rather than truncating them — a long title rendered
+    // as just the status icon. Keep title-len <= dynamic-len.
+    "title-len": 24,
+    "ellipsis": "…",
+    "status-icons": {
+      "playing": "<span font='Material Symbols Rounded 21px' rise='-4pt'>graphic_eq</span>",
+      "paused": "<span font='Material Symbols Rounded 21px' rise='-4pt'>pause</span>",
+      "stopped": "<span font='Material Symbols Rounded 21px' rise='-4pt'>stop</span>"
+    },
+    "on-click": "play-pause",
+    "on-click-right": "next",
+    "on-scroll-up": "next",
+    "on-scroll-down": "previous",
+    "tooltip": true,
+    "tooltip-format": "{player}  ·  {status}\n\n{title}\n{artist}\n{album}"
+  }
+}

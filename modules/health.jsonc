@@ -1,0 +1,12 @@
+{
+  // Invisible unless something is actually broken (hide-on-ok).
+  "systemd-failed-units": {
+    "hide-on-ok": true,
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>warning</span> {nr_failed}",
+    "format-ok": "",
+    // Watch both system services and applications managed as user services.
+    "system": true,
+    "user": true,
+    "on-click": "alacritty -e sh -c 'systemctl --failed; echo; systemctl --user --failed; echo \"[Enter to close]\"; read -r _'"
+  }
+}

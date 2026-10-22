@@ -1,0 +1,64 @@
+{
+  // Optional API spend per New API account; see README.md for integration.
+  //
+  // Waybar builds its module list once at startup and cannot add pills at
+  // runtime, but the account list changes — so six fixed slots are declared
+  // here and scripts/newapi.sh maps slot N to the Nth account in
+  // ~/.config/newapi/accounts.json. Slots past the end of that list print
+  // nothing and Waybar hides them, exactly like custom/gpu does on failure.
+  // Adding or removing an account with `newapi set-key` / `newapi rm` needs no
+  // edit to this file and no Waybar restart.
+  //
+  // interval 30 is the TICK, not the report period. Waybar fixes "interval" at
+  // parse time — changing it means editing this file and restarting the bar —
+  // so the real period lives in the registry and is set with
+  // `newapi set-interval 5m`. Each tick the script checks whether that period
+  // has elapsed; if not it replays its cached JSON (one stat, one cat) and makes
+  // no network call. A 30 s tick is therefore what bounds how quickly a new
+  // `set-interval` takes effect, not how often the providers get hit.
+  //
+  // No on-click and no thresholds: the provider exposes total
+  // spend only, never a remaining balance, so there is no ratio to colour.
+
+  "custom/newapi-1": {
+    "exec": "~/.config/waybar/scripts/newapi.sh 1",
+    "return-type": "json",
+    "interval": 30,
+    "tooltip": true
+  },
+
+  "custom/newapi-2": {
+    "exec": "~/.config/waybar/scripts/newapi.sh 2",
+    "return-type": "json",
+    "interval": 30,
+    "tooltip": true
+  },
+
+  "custom/newapi-3": {
+    "exec": "~/.config/waybar/scripts/newapi.sh 3",
+    "return-type": "json",
+    "interval": 30,
+    "tooltip": true
+  },
+
+  "custom/newapi-4": {
+    "exec": "~/.config/waybar/scripts/newapi.sh 4",
+    "return-type": "json",
+    "interval": 30,
+    "tooltip": true
+  },
+
+  "custom/newapi-5": {
+    "exec": "~/.config/waybar/scripts/newapi.sh 5",
+    "return-type": "json",
+    "interval": 30,
+    "tooltip": true
+  },
+
+  "custom/newapi-6": {
+    "exec": "~/.config/waybar/scripts/newapi.sh 6",
+    "return-type": "json",
+    "interval": 30,
+    "tooltip": true
+  }
+}

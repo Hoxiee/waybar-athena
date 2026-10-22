@@ -1,0 +1,11 @@
+{
+  // NVIDIA telemetry through nvidia-smi, for drivers without a hwmon node.
+  // scripts/gpu.sh emits nothing on failure, so the pill self-hides.
+  "custom/gpu": {
+    "exec": "~/.config/waybar/scripts/gpu.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true,
+    "on-click": "alacritty -e nvtop"
+  }
+}

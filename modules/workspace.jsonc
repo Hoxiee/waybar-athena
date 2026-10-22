@@ -1,0 +1,15 @@
+{
+  // Pac-Man: the focused workspace is Pac-Man, the others are the ghosts.
+  // tokens/workspace.css colours the ghosts Blinky / Pinky / Inky / Clyde by
+  // position (from palette roles) and dims the ones with no windows.
+  "niri/workspaces": {
+    "format": "{icon}",
+    "on-click": "activate",
+    "all-outputs": true,
+    "format-icons": {
+      "active": "<span font='JetBrainsMono Nerd Font 22px' line_height='0.6'>󰮯</span>",
+      "default": "<span font='JetBrainsMono Nerd Font 24px' line_height='0.6'>󰊠</span>",
+      "urgent": "<span font='JetBrainsMono Nerd Font 24px' line_height='0.6'>󰧵</span>"
+    }
+  }
+}

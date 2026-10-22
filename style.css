@@ -1,0 +1,18 @@
+/* Athena / niri — entry point.
+ *
+ * Import order matters, and the token files do not import each other:
+ *   colors     matugen palette (surfaces, containers, hero accents)
+ *   base       warn/ok literals, reset, tooltip
+ *   capsule    the island shape and state layers every module shares
+ *   accent     resting colour of each module (tonal text / filled chips)
+ *   state      thresholds; repaints accent, so it must come after it
+ *   workspace  centre island's contents
+ *   slider     audio drawer slider
+ */
+@import "tokens/colors.css";
+@import "tokens/base.css";
+@import "tokens/capsule.css";
+@import "tokens/accent.css";
+@import "tokens/state.css";
+@import "tokens/workspace.css";
+@import "tokens/slider.css";

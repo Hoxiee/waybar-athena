@@ -1,0 +1,43 @@
+{
+  // swaync-client -swb streams these classes: none / notification / dnd-none /
+  // dnd-notification / inhibited-* / dnd-inhibited-*, and the same name as
+  // "alt", which is what picks the icon. Unread uses the filled glyph.
+  "custom/notifications": {
+    "exec": "swaync-client -swb",
+    "return-type": "json",
+    "escape": true,
+    "format": "{icon} {text}",
+    "format-icons": {
+      "none": "<span font='Material Symbols Rounded 21px' rise='-4pt'>notifications</span>",
+      "notification": "<span font='Material Symbols Rounded 21px @FILL=1' rise='-4pt'>notifications_unread</span>",
+      "dnd-none": "<span font='Material Symbols Rounded 21px' rise='-4pt'>notifications_off</span>",
+      "dnd-notification": "<span font='Material Symbols Rounded 21px' rise='-4pt'>notifications_off</span>",
+      "inhibited-none": "<span font='Material Symbols Rounded 21px' rise='-4pt'>notifications_paused</span>",
+      "inhibited-notification": "<span font='Material Symbols Rounded 21px' rise='-4pt'>notifications_paused</span>",
+      "dnd-inhibited-none": "<span font='Material Symbols Rounded 21px' rise='-4pt'>notifications_off</span>",
+      "dnd-inhibited-notification": "<span font='Material Symbols Rounded 21px' rise='-4pt'>notifications_off</span>"
+    },
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "tooltip": true
+  },
+
+  "tray": {
+    "icon-size": 18,
+    "spacing": 10,
+    "show-passive-items": false
+  },
+
+  // An M3 toggle: the outline cup when idle is normal, the filled cup on a
+  // filled circle (tokens/state.css) while the screen is kept awake.
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "<span font='Material Symbols Rounded 21px @FILL=1' rise='-4pt'>coffee</span>",
+      "deactivated": "<span font='Material Symbols Rounded 21px' rise='-4pt'>coffee</span>"
+    },
+    "tooltip": true,
+    "tooltip-format-activated": "Idle inhibited — screen stays awake",
+    "tooltip-format-deactivated": "Idle normal"
+  }
+}

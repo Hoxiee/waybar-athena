@@ -1,0 +1,43 @@
+{
+  // Icons are Material Symbols Rounded ligatures ("memory" draws a chip). Every
+  // module uses the same span, so the icon size and its baseline shift (rise)
+  // are one search-and-replace away:
+  //   <span font='Material Symbols Rounded 21px' rise='-4pt'>NAME</span>
+  "cpu": {
+    "on-click": "alacritty -e htop",
+    "interval": 5,
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>memory</span> {usage}%",
+    // A build or a game legitimately pins all cores, so thresholds set
+    // near the middle of the range would keep the pill permanently coloured
+    // and the colour would stop meaning anything.
+    "states": {
+      "warning": 80,
+      "critical": 95
+    },
+    "tooltip": true,
+    "tooltip-format": "CPU  {usage}%\nLoad  {load}"
+  },
+
+  // AMD k10temp package temperature (Tctl), tuned for Ryzen 7000.
+  // Adapt these paths and thresholds for your CPU; see README.md.
+  // The device directory is stable across boots, unlike hwmonN indices.
+  "temperature": {
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+    "input-filename": "temp1_input",
+    "hwmon-path": [
+      "/sys/class/hwmon/hwmon2/temp1_input",
+      "/sys/class/hwmon/hwmon1/temp1_input"
+    ],
+    "interval": 5,
+    // Zen 4 is specified to Tjmax 95 °C and deliberately boosts until it gets
+    // there, so Tctl in the low 70s under an all-core load is normal operation,
+    // not a warning. 80 °C means the cooler is working; 90 °C is the edge of
+    // thermal throttling.
+    "warning-threshold": 80,
+    "critical-threshold": 90,
+    "format": "<span font='Material Symbols Rounded 21px' rise='-4pt'>thermostat</span> {temperatureC}°C",
+    "format-critical": "<span font='Material Symbols Rounded 21px @FILL=1' rise='-4pt'>local_fire_department</span> {temperatureC}°C",
+    "tooltip": true,
+    "tooltip-format": "CPU package  {temperatureC}°C"
+  }
+}

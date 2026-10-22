@@ -1,0 +1,200 @@
+/* Thresholds and status colours. Loaded after accent.css and every selector
+ * here is id + class, so it always beats the resting colour.
+ *
+ * "Off" is @outline: dim means dormant. "Warning" is a literal amber, since M3
+ * has no such role. "Critical" is the palette's @error, and only a live
+ * hardware reading pulses — as a container, not a glow: the readout's
+ * background swells to @error_container and back, the way an M3 error chip
+ * would. Standing conditions (failed units, an exhausted quota) are a static
+ * error chip: something that blinks for hours stops being read.
+ */
+
+/*======= ANIMATION =======*/
+/* Inner readouts are transparent at rest, standalone pills sit on
+ * @surface_container, hence two variants. */
+@keyframes pulse-chip {
+  from { background-color: alpha(@error_container, 0); }
+  to   { background-color: @error_container; }
+}
+
+@keyframes pulse-pill {
+  from { background-color: @surface_container; }
+  to   { background-color: @error_container; }
+}
+
+/*======= THRESHOLDS =======*/
+/* "warning"/"critical" come from the "states" object on cpu/memory/disk and
+ * from warning-threshold/critical-threshold on temperature; custom/gpu sets the
+ * same two class names from scripts/gpu.sh. */
+#cpu.warning,
+#memory.warning,
+#disk.warning,
+#temperature.warning,
+#custom-gpu.warning {
+  color: @state_warn;
+}
+
+#cpu.critical,
+#memory.critical,
+#disk.critical,
+#temperature.critical {
+  color: @error;
+  animation: pulse-chip 900ms cubic-bezier(0.2, 0, 0, 1) infinite alternate;
+}
+
+#custom-gpu.critical {
+  color: @error;
+  animation: pulse-pill 900ms cubic-bezier(0.2, 0, 0, 1) infinite alternate;
+}
+
+/*======= AUDIO =======*/
+#pulseaudio.muted {
+  color: @error;
+}
+
+/* Bluetooth sink — worth flagging, since it changes what "volume" even means. */
+#pulseaudio.bluetooth {
+  color: @tertiary;
+}
+
+/* A muted mic is the normal resting state under push-to-talk, so it is dimmed,
+ * not alarmed. */
+#pulseaudio.source-muted {
+  color: @outline;
+}
+
+/*======= KEYBOARD LAYOUT =======*/
+/* niri sets layout "us,ru"; the module adds a class named after the layout's
+ * short name. US is the resting state; RU turns the tag into a filled chip so a
+ * stray alt+shift is obvious before you start typing. */
+#language.us {
+  color: @on_surface_variant;
+}
+
+#language.ru {
+  background-color: @tertiary_container;
+  box-shadow: none;
+  color: @on_tertiary_container;
+}
+
+#language.ru:hover {
+  background-color: mix(@tertiary_container, @on_tertiary_container, 0.08);
+}
+
+/*======= PUSH-TO-TALK =======*/
+/* Classes emitted by yaptt-indicator (passed on as "alt" by scripts/ptt.sh). */
+#custom-ptt.ptt-off {
+  color: @outline;
+}
+
+#custom-ptt.ptt-on {
+  color: @primary;
+}
+
+#custom-ptt.ptt-talking,
+#custom-ptt.ptt-talking:hover {
+  background-color: @primary;
+  color: @on_primary;
+}
+
+/*======= MEDIA =======*/
+#mpris.paused,
+#mpris.stopped {
+  background-color: @surface_container;
+  box-shadow: inset 0 0 0 1px alpha(@on_surface, 0.07);
+  color: @on_surface_variant;
+}
+
+#mpris.paused:hover,
+#mpris.stopped:hover {
+  background-color: mix(@surface_container, @on_surface, 0.08);
+}
+
+/*======= CLAUDE =======*/
+/* Classes from scripts/claude-usage.py. The progress line inside the label is
+ * coloured by the script (from this same palette); the pill carries the rest.
+ * warning = past 75% or on pace to run out before the reset. */
+#custom-claude.warning {
+  color: @state_warn;
+}
+
+#custom-claude.critical {
+  color: @error;
+}
+
+#custom-claude.limited,
+#custom-claude.limited:hover {
+  background-color: @error_container;
+  box-shadow: none;
+  color: @on_error_container;
+}
+
+#custom-claude.stale,
+#custom-claude.auth,
+#custom-claude.error {
+  color: @outline;
+}
+
+/*======= NOTIFICATIONS =======*/
+/* swaync-client -swb emits exactly these class names. */
+#custom-notifications.notification {
+  color: @primary;
+}
+
+#custom-notifications.dnd-none,
+#custom-notifications.dnd-notification,
+#custom-notifications.dnd-inhibited-none,
+#custom-notifications.dnd-inhibited-notification {
+  color: @outline;
+}
+
+#custom-notifications.inhibited-none,
+#custom-notifications.inhibited-notification {
+  color: @state_warn;
+}
+
+/*======= IDLE INHIBITOR =======*/
+/* An M3 toggle: off is a dim outline icon, on is a filled circle with a
+ * filled icon (the glyph's FILL axis is set in modules/notifications.jsonc). */
+#idle_inhibitor.deactivated {
+  color: @outline;
+}
+
+#idle_inhibitor.activated,
+#idle_inhibitor.activated:hover {
+  background-color: @primary;
+  color: @on_primary;
+}
+
+/*======= HEALTH =======*/
+/* hide-on-ok keeps this off the bar entirely until something is actually
+ * failed, so any colour here means "look at me". */
+#systemd-failed-units,
+#systemd-failed-units.degraded {
+  background-color: @error_container;
+  box-shadow: none;
+  color: @on_error_container;
+}
+
+#systemd-failed-units:hover {
+  background-color: mix(@error_container, @on_error_container, 0.08);
+}
+
+/*======= NETWORK =======*/
+#network.disconnected,
+#network.disabled {
+  color: @error;
+}
+
+#network.linked {
+  color: @state_warn;
+}
+
+#bluetooth.disabled,
+#bluetooth.off {
+  color: @outline;
+}
+
+#bluetooth.connected {
+  color: @primary;
+}

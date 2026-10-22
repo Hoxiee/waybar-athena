@@ -1,0 +1,22 @@
+{
+  // Claude subscription monitor (scripts/claude-usage.py). A long-lived
+  // process: no "interval", it prints a line whenever something changes and
+  // re-renders the countdown every minute on its own. restart-interval brings
+  // it back if it ever exits.
+  //
+  // Face: session %, an M3-style progress line, time to reset. The weekly cap
+  // joins the face once it passes 50%; click for both windows side by side.
+  // The meter turns amber past 75% or when the last hour's burn rate would
+  // run the session out before it resets, red past 90%; an exhausted window
+  // turns the whole pill into an error chip with the time it comes back.
+  "custom/claude": {
+    "exec": "~/.config/waybar/scripts/claude-usage.py",
+    "return-type": "json",
+    "restart-interval": 15,
+    "exec-on-event": false,
+    "tooltip": true,
+    "on-click": "~/.config/waybar/scripts/claude-usage.py --toggle",
+    "on-click-right": "~/.config/waybar/scripts/claude-usage.py --refresh",
+    "on-click-middle": "~/.config/waybar/scripts/claude-usage.py --open"
+  }
+}
